@@ -1,6 +1,7 @@
 from db.run_sql import run_sql
 
 from models.artist import Artist
+from models.album import Album
 
 def save(artist):
     sql = "INSERT INTO artists (name) VALUES (%s) RETURNING *"
@@ -31,6 +32,18 @@ def select_all():
         artist = Artist(row['name'], row['id'])
         artists.append(artist)
     return artists
+
+def select_albums_by_artist(artist):
+    albums_by_artist = []
+
+    sql = "SELECT * FROM albums WHERE artist_id = %s"
+    values = [artist.id]
+    results = run_sql(sql, values)
+    if results:
+        for result in results:
+            album = Album(result['title'], result['genre'], result['artist_id'])
+            albums_by_artist.append(album)
+        return albums_by_artist
 
 def update(artist):
     sql = "UPDATE artists SET name = %s WHERE id = %s"
